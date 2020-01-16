@@ -1,0 +1,9 @@
+
+setup:
+* make setup
+
+run test:
+* make run
+
+open database:
+* make open_db

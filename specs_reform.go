@@ -27,7 +27,7 @@ func (v *specViewType) Name() string {
 
 // Columns returns a new slice of column names for that view or table in SQL database.
 func (v *specViewType) Columns() []string {
-	return []string{"status", "filename", "line_number", "commit_id"}
+	return []string{"status", "filename", "line_number", "commit_id", "created_at"}
 }
 
 // NewStruct makes a new struct for that view or table.
@@ -37,17 +37,18 @@ func (v *specViewType) NewStruct() reform.Struct {
 
 // SpecView represents specs view or table in SQL database.
 var SpecView = &specViewType{
-	s: parse.StructInfo{Type: "Spec", SQLSchema: "", SQLName: "specs", Fields: []parse.FieldInfo{{Name: "Status", Type: "int64", Column: "status"}, {Name: "Filename", Type: "string", Column: "filename"}, {Name: "LineNumber", Type: "int64", Column: "line_number"}, {Name: "CommitID", Type: "int64", Column: "commit_id"}}, PKFieldIndex: -1},
+	s: parse.StructInfo{Type: "Spec", SQLSchema: "", SQLName: "specs", Fields: []parse.FieldInfo{{Name: "Status", Type: "int64", Column: "status"}, {Name: "Filename", Type: "string", Column: "filename"}, {Name: "LineNumber", Type: "int64", Column: "line_number"}, {Name: "CommitID", Type: "int64", Column: "commit_id"}, {Name: "CreatedAt", Type: "time.Time", Column: "created_at"}}, PKFieldIndex: -1},
 	z: new(Spec).Values(),
 }
 
 // String returns a string representation of this struct or record.
 func (s Spec) String() string {
-	res := make([]string, 4)
+	res := make([]string, 5)
 	res[0] = "Status: " + reform.Inspect(s.Status, true)
 	res[1] = "Filename: " + reform.Inspect(s.Filename, true)
 	res[2] = "LineNumber: " + reform.Inspect(s.LineNumber, true)
 	res[3] = "CommitID: " + reform.Inspect(s.CommitID, true)
+	res[4] = "CreatedAt: " + reform.Inspect(s.CreatedAt, true)
 	return strings.Join(res, ", ")
 }
 
@@ -59,6 +60,7 @@ func (s *Spec) Values() []interface{} {
 		s.Filename,
 		s.LineNumber,
 		s.CommitID,
+		s.CreatedAt,
 	}
 }
 
@@ -70,6 +72,7 @@ func (s *Spec) Pointers() []interface{} {
 		&s.Filename,
 		&s.LineNumber,
 		&s.CommitID,
+		&s.CreatedAt,
 	}
 }
 

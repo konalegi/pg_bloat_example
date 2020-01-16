@@ -14,9 +14,9 @@ import (
 
 const (
 	insertBatchSize = 10_000
-	workersCount    = 5
-	deleteCount     = 300_000
-	cleanerInterval = time.Second * 5
+	workersCount    = 8
+	cleanerInterval = time.Second * 30
+	vacuumInterval  = time.Minute * 2
 )
 
 func main() {
@@ -38,6 +38,7 @@ func main() {
 	db := reform.NewDB(conn, postgresql.Dialect, nil)
 
 	go cleaner(db, logger.WithField("system", "cleaner"))
+	go manualVacuumer(db, logger.WithField("system", "vacuumer"))
 	runWorkers(db, logger.WithField("system", "worker"))
 }
 
@@ -57,11 +58,23 @@ func runWorkers(db *reform.DB, logger *logrus.Entry) {
 	}
 }
 
+func manualVacuumer(db *reform.DB, logger *logrus.Entry) {
+	for {
+		_, err := db.Exec("vacuum")
+		if err != nil {
+			log.Fatal(err)
+			continue
+		}
+
+		logger.Info("Manual vacuum completed")
+		time.Sleep(vacuumInterval)
+	}
+}
+
 func cleaner(db *reform.DB, logger *logrus.Entry) {
 	var counter int64
 	for {
-
-		res, err := db.Exec("DELETE FROM specs WHERE ctid IN (SELECT ctid FROM specs LIMIT $1)", deleteCount)
+		res, err := db.Exec("DELETE FROM specs WHERE created_at < $1", time.Now().Add(-20*time.Second))
 		if err != nil {
 			log.Fatal(err)
 			continue
@@ -87,6 +100,7 @@ func batchOfSpecs() []reform.Struct {
 			LineNumber: 10,
 			Filename:   "/spec/data",
 			CommitID:   23233,
+			CreatedAt:  time.Now(),
 		}
 	}
 

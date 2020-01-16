@@ -26,7 +26,8 @@ CREATE TABLE public.specs (
     status integer NOT NULL,
     filename character varying(50) NOT NULL,
     line_number integer NOT NULL,
-    commit_id integer NOT NULL
+    commit_id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL
 );
 
 
@@ -40,5 +41,13 @@ CREATE INDEX commit_id_idx ON public.specs USING btree (commit_id);
 
 
 --
+-- Name: specs_created_at_idx; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX specs_created_at_idx ON public.specs USING btree (created_at);
+
+
+--
 -- PostgreSQL database dump complete
 --
+
