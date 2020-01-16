@@ -1,4 +1,31 @@
+This application is designed to see what happens with database under heavy mutation loads.
+This application inserts/deletes into postgres database using several threads.
 
+How to start:
+* setup
+* run tests
+* in parallel tab open database and monitor the size of the table
+```
+$ make open_db
+docker-compose run --rm app psql -U postgres -d pg_bloat_db -h postgres
+Starting pg_bloat_example_postgres_1 ... done
+psql (12.1, server 11.1)
+Type "help" for help.
+
+pg_bloat_db=# \dti+
+                                List of relations
+ Schema |         Name         | Type  |  Owner   | Table |  Size  | Description
+--------+----------------------+-------+----------+-------+--------+-------------
+ public | commit_id_idx        | index | postgres | specs | 333 MB |
+ public | specs                | table | postgres |       | 309 MB |
+ public | specs_created_at_idx | index | postgres | specs | 352 MB |
+(3 rows)
+
+pg_bloat_db=#
+```
+
+Commands:
+```
 setup:
 * make setup
 
@@ -7,3 +34,5 @@ run test:
 
 open database:
 * make open_db
+```
+
