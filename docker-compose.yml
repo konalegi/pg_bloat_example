@@ -1,0 +1,24 @@
+version: '3'
+
+volumes:
+  go-build-cache:
+  pg-storage:
+
+services:
+  app:
+    env_file:
+      - .env
+    build: .
+    depends_on:
+      - postgres
+    command: app
+    volumes:
+      - go-build-cache:/root/.cache/go-build
+      - .:/app/src/konalegi/pg_bloat_example:cached
+      - ./tmp:/tmp
+
+  postgres:
+    image: postgres:11.1-alpine
+    volumes:
+      - pg-storage:/var/lib/postgresql/data
+
